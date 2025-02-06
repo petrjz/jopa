@@ -104,6 +104,10 @@ public class ServerSession extends AbstractSession implements Wrapper {
                 LOG.trace("Acquiring on commit change calculating UnitOfWork.");
                 yield new OnCommitChangePropagatingUnitOfWork(this, configuration);
             }
+            case READ_ONLY -> {
+                LOG.trace("Acquiring read-only UnitOfWork.");
+                yield new ReadOnlyUnitOfWork(this, configuration);
+            }
         };
     }
 
