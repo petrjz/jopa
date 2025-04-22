@@ -93,7 +93,7 @@ public abstract class AbstractUnitOfWork extends AbstractSession implements Unit
     boolean hasNew;
     boolean hasDeleted;
 
-    private boolean transactionActive;
+    protected boolean transactionActive;
     private boolean isActive;
     private boolean flushingChanges;
 
