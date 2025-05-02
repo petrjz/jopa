@@ -17,6 +17,7 @@
  */
 package cz.cvut.kbss.jopa.sessions;
 
+import cz.cvut.kbss.jopa.Printer;
 import cz.cvut.kbss.jopa.model.EntityState;
 import cz.cvut.kbss.jopa.model.LoadState;
 import cz.cvut.kbss.jopa.model.descriptors.Descriptor;
@@ -72,12 +73,15 @@ public class ReadOnlyUnitOfWork extends AbstractUnitOfWork {
 
     @Override
     public void commit() {
+//        long start = System.nanoTime();
         LOG.trace("Read-only UnitOfWork commit started.");
         if (!isActive()) {
             throw new IllegalStateException("Cannot commit inactive Unit of Work!");
         }
         this.clear();
         LOG.trace("UnitOfWork commit finished.");
+//        long end = System.nanoTime();
+//        Printer.aggregate(0L, end - start);
     }
 
     @Override
@@ -101,9 +105,15 @@ public class ReadOnlyUnitOfWork extends AbstractUnitOfWork {
                     .postCloneHandlers(List.of(new PostLoadInvoker(getMetamodel())))
             );
         } else {
+//            long start1 = System.nanoTime();
             params.bypassCache();
             result = storage.find(params);
+//            long end1 = System.nanoTime();
+
+//            long start2 = System.nanoTime();
             registeredResult = registerExistingObject(result, descriptor);
+//            long end2 = System.nanoTime();
+//            Printer.aggregate(end1 - start1, end2 - start2);
         }
         return cls.cast(registeredResult);
     }

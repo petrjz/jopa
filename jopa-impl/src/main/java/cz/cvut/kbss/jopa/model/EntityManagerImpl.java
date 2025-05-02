@@ -17,6 +17,7 @@
  */
 package cz.cvut.kbss.jopa.model;
 
+import cz.cvut.kbss.jopa.Printer;
 import cz.cvut.kbss.jopa.exceptions.OWLPersistenceException;
 import cz.cvut.kbss.jopa.exceptions.TransactionRequiredException;
 import cz.cvut.kbss.jopa.model.annotations.CascadeType;
@@ -430,6 +431,7 @@ public class EntityManagerImpl implements AbstractEntityManager, Wrapper {
         this.cascadingRegistry = null;
         emf.entityManagerClosed(this);
         this.open = false;
+//        Printer.print();
     }
 
     @Override

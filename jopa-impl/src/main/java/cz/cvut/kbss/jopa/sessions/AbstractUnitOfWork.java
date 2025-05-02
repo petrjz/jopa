@@ -17,6 +17,7 @@
  */
 package cz.cvut.kbss.jopa.sessions;
 
+import cz.cvut.kbss.jopa.Printer;
 import cz.cvut.kbss.jopa.exceptions.EntityNotFoundException;
 import cz.cvut.kbss.jopa.exceptions.OWLEntityExistsException;
 import cz.cvut.kbss.jopa.exceptions.OWLPersistenceException;
@@ -59,6 +60,9 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -66,6 +70,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static cz.cvut.kbss.jopa.exceptions.OWLEntityExistsException.individualAlreadyManaged;
 import static cz.cvut.kbss.jopa.sessions.validator.IntegrityConstraintsValidator.getValidator;
@@ -184,12 +189,15 @@ public abstract class AbstractUnitOfWork extends AbstractSession implements Unit
 
     @Override
     public void commit() {
+//        long start = System.nanoTime();
         LOG.trace("UnitOfWork commit started.");
         if (!isActive()) {
             throw new IllegalStateException("Cannot commit inactive Unit of Work!");
         }
         commitUnitOfWork();
         LOG.trace("UnitOfWork commit finished.");
+//        long end = System.nanoTime();
+//        Printer.aggregate(0L, end - start);
     }
 
     /**
@@ -281,12 +289,17 @@ public abstract class AbstractUnitOfWork extends AbstractSession implements Unit
         if (result != null) {
             return result;
         }
+//        long start1 = System.nanoTime();
         result = storage.find(new LoadingParameters<>(cls, getValueAsURI(identifier), descriptor));
+//        long end1 = System.nanoTime();
 
         if (result == null) {
             return null;
         }
+//        long start2 = System.nanoTime();
         final Object clone = registerExistingObject(result, new CloneRegistrationDescriptor(descriptor).postCloneHandlers(List.of(new PostLoadInvoker(getMetamodel()))));
+//        long end2 = System.nanoTime();
+//        Printer.aggregate(end1 - start1, end2 - start2);
         return cls.cast(clone);
     }
 
